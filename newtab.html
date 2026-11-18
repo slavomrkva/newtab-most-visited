@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>New Tab</title>
+  <link rel="stylesheet" href="newtab.css">
+</head>
+<body>
+  <div id="bg"></div>
+
+  <!-- Weather (top left) -->
+  <button id="weather" class="weather" type="button" data-widget="weather" hidden aria-expanded="false" aria-controls="forecast">
+    <span id="wIcon" class="w-icon"></span>
+    <span class="w-text">
+      <span id="wTemp" class="w-temp"></span>
+      <span id="wPlace" class="w-place"></span>
+    </span>
+  </button>
+
+  <section id="forecast" class="forecast" hidden aria-label="Weather forecast">
+    <header>
+      <strong id="fPlace"></strong>
+      <a id="radar" href="https://www.google.com/search?q=weather+radar">Weather &amp; Radar ↗</a>
+    </header>
+    <h3>Hourly</h3>
+    <div id="hourly" class="hourly"></div>
+    <h3>Next 7 days</h3>
+    <div id="daily" class="daily"></div>
+  </section>
+
+  <!-- Focus timer pill (top right, visible while running) -->
+  <button id="focusPill" class="focus-pill" type="button" data-widget="focus" hidden title="Focus timer"></button>
+
+  <main>
+    <section id="clockBox" class="clock-box" data-widget="clock">
+      <div id="clock" class="clock"></div>
+      <div id="greeting" class="greeting"></div>
+    </section>
+
+    <div id="searchBox" class="search-box" data-widget="search">
+    <nav class="engines" id="engines">
+      <button data-mode="web" class="active">Web</button>
+      <button data-mode="images">Images</button>
+      <button data-mode="news">News</button>
+      <button data-mode="video">Video</button>
+      <button data-mode="maps">Maps</button>
+    </nav>
+
+    <form id="search" autocomplete="off">
+      <span id="engineMark" class="g" aria-hidden="true">G</span>
+      <input id="q" type="search" placeholder="Search Google or type a URL" autofocus>
+    </form>
+    </div>
+
+    <section id="grid" data-widget="grid" aria-label="Most visited sites"></section>
+    <p id="empty" hidden>Your history is empty so far. Your most visited sites will appear here after you import history or browse for a while.</p>
+  </main>
+
+  <a id="credit" target="_blank" rel="noopener" hidden></a>
+
+  <!-- Dock (bottom right) -->
+  <nav id="dock" class="dock" data-widget="dock" aria-label="Tools">
+    <button class="dock-btn" data-panel="todoPanel" title="To-do">✓</button>
+    <button class="dock-btn" data-panel="notesPanel" title="Notes">✎</button>
+    <button class="dock-btn" data-panel="focusPanel" title="Focus timer">⏱</button>
+    <button id="editLayoutBtn" class="dock-btn" type="button" title="Edit layout: move the clock, weather, search, icons and buttons">✥</button>
+    <button class="dock-btn" data-panel="settings" title="Settings" aria-label="Settings">⚙</button>
+  </nav>
+
+  <!-- Layout editing toolbar -->
+  <div id="editBar" class="edit-bar" hidden>
+    <span>Drag anything to move it · drag the icon grid's corner ◢ to change its width</span>
+    <button id="resetPositions" type="button">Reset positions</button>
+    <button id="editDone" type="button" class="primary">Done</button>
+  </div>
+
+  <!-- To-do (free) -->
+  <section id="todoPanel" class="panel" hidden aria-label="To-do">
+    <header><h2>To-do</h2><button class="x" data-close aria-label="Close">×</button></header>
+    <form id="todoForm" class="row-form">
+      <input id="todoInput" type="text" placeholder="Add a task and press Enter" maxlength="200">
+    </form>
+    <ul id="todoList" class="todo-list"></ul>
+    <button id="todoClear" class="link-btn" type="button">Clear completed</button>
+  </section>
+
+  <!-- Notes (Pro) -->
+  <section id="notesPanel" class="panel" hidden aria-label="Notes">
+    <header><h2>Notes</h2><button class="x" data-close aria-label="Close">×</button></header>
+    <textarea id="notes" placeholder="Write anything… it saves automatically."></textarea>
+    <p id="notesSaved" class="hint"></p>
+  </section>
+
+  <!-- Focus timer (Pro) -->
+  <section id="focusPanel" class="panel" hidden aria-label="Focus timer">
+    <header><h2>Focus timer</h2><button class="x" data-close aria-label="Close">×</button></header>
+    <div id="focusTime" class="focus-time">25:00</div>
+    <div id="focusPhase" class="hint">Ready to focus</div>
+    <div class="focus-presets">
+      <button type="button" data-minutes="25">25 min focus</button>
+      <button type="button" data-minutes="50">50 min focus</button>
+      <button type="button" data-minutes="5" data-break>5 min break</button>
+    </div>
+    <button id="focusStop" type="button" hidden>Stop</button>
+  </section>
+
+  <!-- Settings -->
+  <aside id="settings" class="panel settings" hidden>
+    <header>
+      <h2>Settings</h2>
+      <button class="x" data-close aria-label="Close">×</button>
+    </header>
+
+    <fieldset>
+      <legend>Sites</legend>
+      <label>Number of sites: <output id="countOut"></output>
+        <input id="count" type="range" min="8" max="120" step="1">
+      </label>
+      <label>Icon size: <output id="sizeOut"></output>
+        <input id="size" type="range" min="36" max="80" step="2">
+      </label>
+      <label>History period
+        <select id="period">
+          <option value="0">All history</option>
+          <option value="365">Last year</option>
+          <option value="90">Last 3 months</option>
+          <option value="30">Last month</option>
+        </select>
+      </label>
+      <label>Group by
+        <select id="groupBy">
+          <option value="host">Site (domain)</option>
+          <option value="url">Exact address</option>
+        </select>
+      </label>
+      <label class="row"><input id="newTab" type="checkbox"> Open sites in a new tab</label>
+      <p class="hint">Drag icons to rearrange them. Hover over an icon: 📌 keeps it on the page, × hides it.</p>
+      <button id="resetLayout" type="button">Reset icon order to most visited</button>
+      <button id="editLayoutSettings" type="button">Move page elements (clock, weather, search…)</button>
+      <button id="unhideAll" type="button">Show all hidden sites (<span id="hiddenCount">0</span>)</button>
+    </fieldset>
+
+    <fieldset>
+      <legend>Clock &amp; search</legend>
+      <label class="row"><input id="showClock" type="checkbox"> Show clock and greeting</label>
+      <label class="row"><input id="clock24" type="checkbox"> 24-hour clock</label>
+      <label>Your name (for the greeting)
+        <input id="userName" type="text" maxlength="40" placeholder="optional">
+      </label>
+      <label>Search engine
+        <select id="engine">
+          <option value="google">Google</option>
+          <option value="bing">Bing</option>
+          <option value="ddg">DuckDuckGo</option>
+        </select>
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Weather</legend>
+      <label class="row"><input id="weatherOn" type="checkbox"> Show weather</label>
+      <label>City (empty = use my location)
+        <input id="city" type="text" placeholder="e.g. Bratislava">
+      </label>
+      <span id="cityStatus" class="hint"></span>
+    </fieldset>
+
+    <fieldset>
+      <legend>Background</legend>
+      <select id="bgMode">
+        <option value="nature">Nature photo</option>
+        <option value="custom">My own image</option>
+        <option value="none">No image</option>
+      </select>
+      <label>New photo
+        <select id="bgEvery">
+          <option value="day">Every day</option>
+          <option value="hour">Every hour</option>
+          <option value="tab">Every new tab</option>
+        </select>
+      </label>
+      <label>Upload image
+        <input id="bgFile" type="file" accept="image/*">
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Appearance</legend>
+      <label>Accent colour
+        <input id="accent" type="color">
+      </label>
+      <label>Darken photo: <output id="dimOut"></output>
+        <input id="dim" type="range" min="0" max="70" step="5">
+      </label>
+      <label>Blur photo: <output id="blurOut"></output>
+        <input id="blur" type="range" min="0" max="12" step="1">
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Backup</legend>
+      <button id="exportBtn" type="button">Export settings, pins, to-dos and notes</button>
+      <label>Import from file
+        <input id="importFile" type="file" accept="application/json,.json">
+      </label>
+      <span id="backupStatus" class="hint"></span>
+    </fieldset>
+
+  </aside>
+
+
+  <script src="newtab.js"></script>
+</body>
+</html>

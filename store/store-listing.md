@@ -19,34 +19,7 @@ Upload `store/new-tab-most-visited-2.2.0.zip`.
 **Summary** (manifest description, max 132 characters)
 > Your most visited sites from history, weather forecast, a daily nature photo, to-dos, notes and a focus timer.
 
-**Description**
-
-> Your most visited sites, automatically. Open a new tab and see the sites you really use, built from your own browsing history and ranked by how often you visit them. Nothing to set up and no bookmarks to arrange. It even picks up history you imported from Firefox or another browser.
->
-> ★ FEATURES
-> • Most visited grid: up to 120 sites from your history, with real site icons
-> • Drag and drop icons to arrange your own layout
-> • Make the page yours: move the clock, weather, search box, icons and buttons anywhere
-> • Pin favourites so they always stay; hide any site with one click
-> • Beautiful nature photos: a new one every day, every hour or every tab, or use your own image
-> • Clock with a personal greeting
-> • Weather for your location or any city: hourly forecast for 24 hours and a 7-day forecast
-> • Search with Google, Bing or DuckDuckGo: web, images, news, video and maps
-> • To-do list, notes and a focus timer (25/50-minute sessions and breaks)
-> • Accent colour, photo dimming and blur
-> • Backup: export and import your settings, pins, to-dos and notes
-> • Settings sync across your computers through your Chrome profile
->
-> 100% free. No ads, no account, no paid version.
->
-> 🔒 PRIVATE BY DESIGN
-> Your history is read on your device to build the grid and is never uploaded. No ads, no analytics, no tracking. To-dos and notes stay in local storage. Only site domain names are sent to an icon service to draw the icons, and location is used only for the weather (you can type a city instead or turn weather off).
->
-> Tips
-> • Drag icons to rearrange them. Hover over an icon: 📌 pins it, × hides it.
-> • Click ✥ (bottom right) to move the clock, weather, search and other elements; Done saves the layout.
-> • The buttons at the bottom right open the to-do list, notes, focus timer, layout editor and Settings.
-> • Click the weather to see the hourly and 7-day forecast.
+**Description**: copy it from `store/description.txt` (plain text, ready to paste).
 
 **Category:** Productivity → Tools
 (If the dashboard shows the older list: Productivity.)

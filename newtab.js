@@ -8,6 +8,7 @@ const DEFAULTS = {
   sortBy: 'smart',    // 'smart' | 'most' | 'recent'
   groupBy: 'host',    // 'host' | 'url'
   newTab: false,
+  hideOpen: true,     // hide sites that are open in other tabs
   hidden: [],         // keys of hidden sites
   pins: [],           // [{ key, url, title }] shown first
   showClock: true,
@@ -155,28 +156,68 @@ async function computeSites(limit) {
 }
 
 // ---------- tiles ----------
-// Chrome's own favicon cache only knows sites opened in Chrome, so history
-// imported from Firefox shows a grey globe. Use icon services that answer with
-// an error status when they have no icon, which lets the letter fallback show.
-function faviconUrls(pageUrl) {
-  const host = new URL(pageUrl).hostname;
-  return [
-    `https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=64`,
-    `https://icons.duckduckgo.com/ip3/${encodeURIComponent(host)}.ico`
-  ];
+// Icons, best source first:
+// 1. Chrome's own favicon cache: exact icons for every site opened in Chrome.
+// 2. Google and DuckDuckGo icon services for sites Chrome has no icon for,
+//    such as history imported from Firefox.
+// 3. The same services for the parent domain, because they often know only
+//    the main site (whatsapp.com) and not a subdomain (web.whatsapp.com).
+// Unknown sites get a generic globe from every source; those are rejected so
+// the coloured letter shows instead.
+function parentDomain(host) {
+  const parts = host.split('.');
+  if (parts.length <= 2) return null;
+  // Keep "example.co.uk" style domains whole.
+  const two = parts.slice(-2);
+  const keep = two[1].length === 2 && two[0].length <= 3 ? 3 : 2;
+  return parts.length > keep ? parts.slice(-keep).join('.') : null;
 }
 
-// The services return a generic globe with a 404 status for unknown sites, and
-// <img> would still display it; checking the status first keeps the letter.
+function serviceUrls(host) {
+  const h = encodeURIComponent(host);
+  return [`https://www.google.com/s2/favicons?domain=${h}&sz=64`, `https://icons.duckduckgo.com/ip3/${h}.ico`];
+}
+
+function chromeFaviconUrl(pageUrl) {
+  const f = new URL(chrome.runtime.getURL('/_favicon/'));
+  f.searchParams.set('pageUrl', pageUrl);
+  f.searchParams.set('size', '64');
+  return f.toString();
+}
+
+async function bytesOf(url) {
+  const r = await fetch(url);
+  if (!r.ok) return null;
+  const blob = await r.blob();
+  if (!blob.type.startsWith('image/') || blob.size < 100) return null;
+  return { blob, bytes: new Uint8Array(await blob.arrayBuffer()) };
+}
+
+const sameBytes = (a, b) => a.length === b.length && a.every((x, i) => x === b[i]);
+
+// Chrome answers with its default globe when it has no icon for a page.
+let chromeDefaultIcon;
+function chromeDefault() {
+  chromeDefaultIcon ??= bytesOf(chromeFaviconUrl('https://unknown-site.invalid/')).catch(() => null);
+  return chromeDefaultIcon;
+}
+
 async function loadIcon(pageUrl) {
-  for (const url of faviconUrls(pageUrl)) {
+  try {
+    const [own, def] = await Promise.all([bytesOf(chromeFaviconUrl(pageUrl)), chromeDefault()]);
+    if (own && !(def && sameBytes(own.bytes, def.bytes))) return URL.createObjectURL(own.blob);
+  } catch { /* fall through to the icon services */ }
+  const host = new URL(pageUrl).hostname;
+  const parent = parentDomain(host);
+  const urls = [...serviceUrls(host), ...(parent ? serviceUrls(parent) : [])];
+  for (const url of urls) {
     try {
       const r = await fetch(url);
       if (!r.ok) continue;
       const blob = await r.blob();
       if (!blob.type.startsWith('image/') || blob.size < 100) continue;
       return URL.createObjectURL(blob);
-    } catch { /* try the next service */ }
+    } catch { /* try the next source */ }
   }
   return null;
 }
@@ -244,12 +285,50 @@ function arrange(items) {
   return [...placed, ...items.filter((it) => !pos.has(it.s.key))];
 }
 
+// Sites open in other tabs are left out of the grid until their tab closes.
+// The computed list keeps spare entries so the grid stays full meanwhile.
+const SPARE_SITES = 30;
+let openKeys = new Set();
+let lastSites = [];
+
+async function updateOpenKeys() {
+  if (!settings.hideOpen || !chrome.tabs) { openKeys = new Set(); return; }
+  const tabs = await chrome.tabs.query({});
+  const keys = new Set();
+  for (const t of tabs) {
+    try {
+      const u = new URL(t.url || t.pendingUrl || '');
+      if (u.protocol === 'http:' || u.protocol === 'https:') keys.add(keyFor(u));
+    } catch { /* not a web page */ }
+  }
+  openKeys = keys;
+}
+
+function setupOpenTabs() {
+  if (!chrome.tabs) return;
+  let timer;
+  const update = () => {
+    clearTimeout(timer);
+    timer = setTimeout(async () => {
+      const before = [...openKeys].sort().join();
+      await updateOpenKeys();
+      if ([...openKeys].sort().join() !== before) render(lastSites);
+    }, 300);
+  };
+  chrome.tabs.onRemoved.addListener(update);
+  chrome.tabs.onUpdated.addListener((id, change) => { if (change.url || change.status === 'complete') update(); });
+  chrome.tabs.onCreated.addListener(update);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) update(); });
+}
+
 function render(sites) {
+  lastSites = sites;
   const grid = $('grid');
   grid.replaceChildren();
+  const shown = sites.filter((s) => !openKeys.has(s.key)).slice(0, settings.count);
   const items = [
     ...settings.pins.map((s) => ({ s, pinned: true })),
-    ...sites.map((s) => ({ s, pinned: false }))
+    ...shown.map((s) => ({ s, pinned: false }))
   ];
   for (const it of arrange(items)) grid.append(tile(it.s, it.pinned));
   $('empty').hidden = items.length > 0;
@@ -307,7 +386,7 @@ function signature() {
 
 async function refresh() {
   try {
-    const sites = await computeSites(settings.count);
+    const sites = await computeSites(settings.count + SPARE_SITES);
     render(sites);
     local.set({ cache: { sites, sig: signature(), time: Date.now() } });
   } catch (err) {
@@ -914,6 +993,7 @@ function setupSettings() {
   bind('sortBy', 'sortBy', String, refresh);
   bind('groupBy', 'groupBy', String, refresh);
   bind('newTab', 'newTab', Boolean, refresh);
+  bind('hideOpen', 'hideOpen', Boolean, async () => { await updateOpenKeys(); render(lastSites); });
   bind('showClock', 'showClock', Boolean, updateClock);
   bind('clock24', 'clock24', Boolean, updateClock);
   bind('userName', 'userName', String, updateClock);
@@ -1111,6 +1191,7 @@ function setupLayoutEditing() {
   layoutOrder = savedOrder;
   // A list computed in the last few minutes is reused as is; ranking by visit
   // age reads individual visits, which is too much work for every new tab.
+  await updateOpenKeys().catch(() => {});
   const cacheValid = cache && cache.sig === signature();
   const cacheFresh = cacheValid && Date.now() - (cache.time || 0) < 10 * 60e3;
   if (cacheValid) render(cache.sites);
@@ -1120,6 +1201,7 @@ function setupLayoutEditing() {
   setupSettings();
   setupDock();
   setupDragAndDrop();
+  setupOpenTabs();
   setupLayoutEditing();
   setupForecastPanel();
   applyBackground();

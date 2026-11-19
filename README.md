@@ -4,6 +4,8 @@ A free Chrome new tab page with a grid of your most visited sites (from browser
 history), a nature photo background, weather with hourly and 7-day forecasts,
 a clock, a to-do list, notes and a focus timer. No ads, no account, no paid tier.
 
+**Install from the Chrome Web Store:** https://chromewebstore.google.com/detail/pfbikbofncoonngdodifmipkknigjfin
+
 **Privacy policy:** https://slavomrkva.github.io/newtab-most-visited/
 
 ## Install (unpacked)

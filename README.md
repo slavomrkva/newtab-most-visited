@@ -16,7 +16,9 @@ After editing files, click ↻ on the extension card in `chrome://extensions`.
 
 ## Features
 
-- **Most visited grid** built from history, 8–120 sites, real site icons.
+- **Most visited grid** built from history, 8–120 sites, real site icons. Sorted **Smart** by default:
+  each visit counts less as it gets older (half-life 14 days), so sites you use now come first;
+  also available: *Most visited (all time)* and *Recently visited*.
 - **Drag and drop** icons to arrange your own layout (Settings → Reset icon order restores the ranking).
 - **Free layout**: the ✥ button turns on edit mode; move the clock, weather, search box, icon grid,
   tool buttons and focus timer anywhere, and drag the grid's corner to change its width.

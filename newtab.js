@@ -5,6 +5,7 @@ const DEFAULTS = {
   count: 40,          // number of most-visited tiles (8–120)
   size: 48,           // icon diameter in px
   period: 0,          // days of history; 0 = all
+  sortBy: 'smart',    // 'smart' | 'most' | 'recent'
   groupBy: 'host',    // 'host' | 'url'
   newTab: false,
   hidden: [],         // keys of hidden sites
@@ -68,32 +69,79 @@ function prettyHost(host) {
   return main.charAt(0).toUpperCase() + main.slice(1);
 }
 
+// Ranking. "smart" weighs every visit by its age (half-life HALF_LIFE_DAYS), so
+// a site used today outranks one that was used heavily months ago; sites with
+// no recent visits fill any remaining places by their all-time visit count.
+const HALF_LIFE_DAYS = 14;
+const RECENT_WINDOW_DAYS = 90;
+const MAX_SCORED_URLS = 2000;
+
+// "(3) WhatsApp" -> "WhatsApp": unread counters are not part of a site's name.
+function cleanTitle(t) {
+  return (t || '').replace(/^\(\d+\+?\)\s*/, '').trim();
+}
+
+async function recentScores(items, now) {
+  const since = now - RECENT_WINDOW_DAYS * DAY;
+  const recent = items
+    .filter((it) => it.lastVisitTime >= since)
+    .sort((a, b) => (b.visitCount || 0) - (a.visitCount || 0))
+    .slice(0, MAX_SCORED_URLS);
+  const scores = new Map();
+  for (let i = 0; i < recent.length; i += 50) {
+    const batch = recent.slice(i, i + 50);
+    const visits = await Promise.all(batch.map((it) => chrome.history.getVisits({ url: it.url }).catch(() => [])));
+    batch.forEach((it, j) => {
+      let s = 0;
+      for (const v of visits[j]) {
+        if (v.visitTime < since) continue;
+        const ageDays = (now - v.visitTime) / DAY;
+        // Reloads say little about what the user chose to open.
+        const w = v.transition === 'reload' ? 0.05 : v.transition === 'typed' ? 1.5 : 1;
+        s += w * Math.pow(0.5, ageDays / HALF_LIFE_DAYS);
+      }
+      scores.set(it.url, s);
+    });
+  }
+  return scores;
+}
+
 async function computeSites(limit) {
-  const startTime = settings.period ? Date.now() - settings.period * DAY : 0;
+  const now = Date.now();
+  const startTime = settings.period ? now - settings.period * DAY : 0;
   const items = await chrome.history.search({ text: '', startTime, maxResults: 50000 });
+  const web = items.filter((it) => /^https?:/.test(it.url));
+  const recent = settings.sortBy === 'smart' ? await recentScores(web, now) : new Map();
   const map = new Map();
 
-  for (const it of items) {
+  for (const it of web) {
     let u;
     try { u = new URL(it.url); } catch { continue; }
-    if (u.protocol !== 'http:' && u.protocol !== 'https:') continue;
 
     const key = keyFor(u);
-    const score = (it.visitCount || 0) + (it.typedCount || 0);
+    const count = (it.visitCount || 0) + (it.typedCount || 0);
     let s = map.get(key);
     if (!s) {
-      s = { key, score: 0, url: '', title: '', best: -1, rootTitle: '' };
+      s = { key, count: 0, recent: 0, last: 0, url: '', title: '', best: -1, rootTitle: '' };
       map.set(key, s);
     }
-    s.score += score;
-    if (score > s.best) { s.best = score; s.url = it.url; s.title = it.title || ''; }
-    if (u.pathname === '/' && !u.search && it.title) s.rootTitle = it.title;
+    s.count += count;
+    s.recent += recent.get(it.url) || 0;
+    s.last = Math.max(s.last, it.lastVisitTime || 0);
+    if (count > s.best) { s.best = count; s.url = it.url; s.title = cleanTitle(it.title); }
+    if (u.pathname === '/' && !u.search && it.title) s.rootTitle = cleanTitle(it.title);
   }
+
+  const order = {
+    most: (a, b) => b.count - a.count,
+    recent: (a, b) => b.last - a.last,
+    smart: (a, b) => (b.recent - a.recent) || (b.count - a.count)
+  }[settings.sortBy] || ((a, b) => b.count - a.count);
 
   const skip = new Set([...settings.hidden, ...settings.pins.map((p) => p.key)]);
   return [...map.values()]
-    .filter((s) => !skip.has(s.key) && s.score > 0)
-    .sort((a, b) => b.score - a.score)
+    .filter((s) => !skip.has(s.key) && s.count > 0)
+    .sort(order)
     .slice(0, limit)
     .map((s) => {
       const u = new URL(s.url);
@@ -254,14 +302,14 @@ function setupDragAndDrop() {
 
 // Settings that change the list; a cached list is valid only for the same values.
 function signature() {
-  return JSON.stringify([settings.count, settings.period, settings.groupBy, settings.hidden, settings.pins]);
+  return JSON.stringify([settings.count, settings.period, settings.sortBy, settings.groupBy, settings.hidden, settings.pins]);
 }
 
 async function refresh() {
   try {
     const sites = await computeSites(settings.count);
     render(sites);
-    local.set({ cache: { sites, sig: signature() } });
+    local.set({ cache: { sites, sig: signature(), time: Date.now() } });
   } catch (err) {
     console.error('History load failed', err);
   }
@@ -863,6 +911,7 @@ function setupSettings() {
   bind('count', 'count', Number, () => { outputs(); debounced(); });
   bind('size', 'size', Number, outputs);
   bind('period', 'period', Number, refresh);
+  bind('sortBy', 'sortBy', String, refresh);
   bind('groupBy', 'groupBy', String, refresh);
   bind('newTab', 'newTab', Boolean, refresh);
   bind('showClock', 'showClock', Boolean, updateClock);
@@ -1060,7 +1109,11 @@ function setupLayoutEditing() {
   // Show the previous list immediately, then recompute from history.
   const { cache, layoutOrder: savedOrder = [] } = await local.get(['cache', 'layoutOrder']);
   layoutOrder = savedOrder;
-  if (cache && cache.sig === signature()) render(cache.sites);
+  // A list computed in the last few minutes is reused as is; ranking by visit
+  // age reads individual visits, which is too much work for every new tab.
+  const cacheValid = cache && cache.sig === signature();
+  const cacheFresh = cacheValid && Date.now() - (cache.time || 0) < 10 * 60e3;
+  if (cacheValid) render(cache.sites);
 
   setupClock();
   setupSearch();
@@ -1071,7 +1124,7 @@ function setupLayoutEditing() {
   setupForecastPanel();
   applyBackground();
   showWeather();
-  refresh();
+  if (cacheFresh) $('hiddenCount').textContent = settings.hidden.length; else refresh();
   setupTodos();
   setupNotes();
   setupFocus();

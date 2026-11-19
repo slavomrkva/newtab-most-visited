@@ -9,7 +9,7 @@ The extension is completely free: no paid tier, no ads, no account.
 
 ## 1. Package
 
-Upload `store/new-tab-most-visited-2.2.0.zip`.
+Upload `store/new-tab-most-visited-2.3.0.zip`.
 
 ## 2. Store listing
 

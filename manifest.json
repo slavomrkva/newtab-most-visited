@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "New Tab – Most Visited",
   "short_name": "New Tab",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "Your most visited sites from history, weather forecast, a daily nature photo, to-dos, notes and a focus timer.",
   "icons": {
     "16": "icons/icon16.png",

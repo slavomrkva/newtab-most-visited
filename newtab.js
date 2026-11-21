@@ -33,14 +33,47 @@ const $ = (id) => document.getElementById(id);
 let settings = { ...DEFAULTS };
 
 // ---------- storage ----------
+// Values this tab wrote last, by key. chrome.storage.onChanged also reports a
+// tab's own writes; those echoes are recognised and ignored, so they cannot
+// overwrite a newer value the tab already holds.
+const written = new Map();
+const SHARED_KEYS = new Set(['todos', 'notes', 'layoutOrder', 'hidden', 'pins', 'widgetPos']);
+function remember(v) {
+  for (const [k, val] of Object.entries(v)) if (SHARED_KEYS.has(k)) written.set(k, JSON.stringify(val));
+}
+const isEcho = (key, change) => written.get(key) === JSON.stringify(change.newValue);
+
+// Sync storage allows 120 writes a minute and 8 KB per key; a failed write is
+// logged instead of breaking the control that caused it.
 const sync = {
   get: () => chrome.storage.sync.get(DEFAULTS),
-  set: (v) => chrome.storage.sync.set(v)
+  set: (v) => {
+    remember(v);
+    return chrome.storage.sync.set(v).catch((err) => console.warn('Saving settings failed', Object.keys(v), err));
+  }
 };
 const local = {
   get: (k) => chrome.storage.local.get(k),
-  set: (v) => chrome.storage.local.set(v)
+  set: (v) => { remember(v); return chrome.storage.local.set(v); }
 };
+
+// Sliders, the colour picker and the name field fire on every keystroke or
+// pixel; their writes are collected and saved together.
+const pendingSync = {};
+let syncTimer;
+function syncLater(v) {
+  Object.assign(pendingSync, v);
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(flushSync, 400);
+}
+function flushSync() {
+  clearTimeout(syncTimer);
+  const v = { ...pendingSync };
+  for (const k of Object.keys(pendingSync)) delete pendingSync[k];
+  if (Object.keys(v).length) sync.set(v);
+}
+addEventListener('pagehide', flushSync);
+document.addEventListener('visibilitychange', () => { if (document.hidden) flushSync(); });
 
 function el(tag, cls, text) {
   const e = document.createElement(tag);
@@ -202,12 +235,29 @@ function chromeDefault() {
   return chromeDefaultIcon;
 }
 
-async function loadIcon(pageUrl) {
+// Only hosts reachable on the public internet are looked up at the icon
+// services; local machines, LAN devices and company intranet names stay private.
+function isPublicHost(host) {
+  if (!host || !host.includes('.')) return false;                       // localhost, single-label intranet names
+  if (/^[\d.]+$/.test(host) || host.includes(':') || host.startsWith('[')) return false; // IPv4, IPv6
+  return !/\.(local|lan|home|internal|intranet|corp|private|arpa|localhost|localdomain|test|example|invalid)$/i.test(host);
+}
+
+// Each icon is fetched once per page; re-rendering the grid (tabs opened or
+// closed, settings changed) reuses it instead of fetching it again.
+const iconCache = new Map();
+function loadIcon(pageUrl) {
+  if (!iconCache.has(pageUrl)) iconCache.set(pageUrl, fetchIcon(pageUrl).catch(() => null));
+  return iconCache.get(pageUrl);
+}
+
+async function fetchIcon(pageUrl) {
   try {
     const [own, def] = await Promise.all([bytesOf(chromeFaviconUrl(pageUrl)), chromeDefault()]);
     if (own && !(def && sameBytes(own.bytes, def.bytes))) return URL.createObjectURL(own.blob);
   } catch { /* fall through to the icon services */ }
   const host = new URL(pageUrl).hostname;
+  if (!isPublicHost(host)) return null;
   const parent = parentDomain(host);
   const urls = [...serviceUrls(host), ...(parent ? serviceUrls(parent) : [])];
   for (const url of urls) {
@@ -325,7 +375,10 @@ function render(sites) {
   lastSites = sites;
   const grid = $('grid');
   grid.replaceChildren();
-  const shown = sites.filter((s) => !openKeys.has(s.key)).slice(0, settings.count);
+  // Hidden and pinned keys are filtered here too, so a change made in another
+  // tab shows at once without recomputing the list from history.
+  const skip = new Set([...settings.hidden, ...settings.pins.map((p) => p.key)]);
+  const shown = sites.filter((s) => !openKeys.has(s.key) && !skip.has(s.key)).slice(0, settings.count);
   const items = [
     ...settings.pins.map((s) => ({ s, pinned: true })),
     ...shown.map((s) => ({ s, pinned: false }))
@@ -529,11 +582,14 @@ function describe(code, isDay) {
   return { icon: isDay ? row[1] : row[2], text: row[3] };
 }
 
+const round2 = (n) => Math.round(n * 100) / 100;
+
 function devicePosition() {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) return reject(new Error('no geolocation'));
     navigator.geolocation.getCurrentPosition(
-      (p) => resolve({ lat: p.coords.latitude, lon: p.coords.longitude }),
+      // About 1 km precision is plenty for weather and keeps the exact position private.
+      (p) => resolve({ lat: round2(p.coords.latitude), lon: round2(p.coords.longitude) }),
       reject,
       { timeout: 10000, maximumAge: 3600e3 }
     );
@@ -682,7 +738,7 @@ async function showWeather() {
   if (!wx || wx.key !== key || !wx.hourly || Date.now() - wx.time > 30 * 60e3) {
     try {
       const q = new URLSearchParams({
-        latitude: place.lat, longitude: place.lon, timezone: 'auto', forecast_days: '8',
+        latitude: round2(place.lat), longitude: round2(place.lon), timezone: 'auto', forecast_days: '8',
         current: 'temperature_2m,weather_code,is_day',
         hourly: 'temperature_2m,weather_code,precipitation_probability,is_day',
         daily: 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max'
@@ -831,6 +887,27 @@ async function setupTodos() {
   $('todoClear').addEventListener('click', () => { todos = todos.filter((t) => !t.done); saveTodos(); });
 }
 
+// Several new tabs can be open at once. Each one takes over changes made in
+// the others, so it never saves an outdated copy over them.
+function setupCrossTabSync() {
+  chrome.storage.onChanged.addListener((changes, area) => {
+    const fresh = (k) => k in changes && !isEcho(k, changes[k]);
+    if (area === 'local') {
+      if (fresh('todos')) { todos = changes.todos.newValue || []; renderTodos(); }
+      if (fresh('notes') && document.activeElement !== $('notes')) $('notes').value = changes.notes.newValue || '';
+      if (fresh('layoutOrder')) { layoutOrder = changes.layoutOrder.newValue || []; render(lastSites); }
+    }
+    if (area === 'sync') {
+      let list = false;
+      for (const k of ['hidden', 'pins']) {
+        if (fresh(k)) { settings[k] = changes[k].newValue || []; list = true; }
+      }
+      if (list) { render(lastSites); $('hiddenCount').textContent = settings.hidden.length; }
+      if (fresh('widgetPos') && !editing) { settings.widgetPos = changes.widgetPos.newValue || {}; applyWidgetPositions(); }
+    }
+  });
+}
+
 // ---------- notes ----------
 async function setupNotes() {
   const { notes = '' } = await local.get('notes');
@@ -969,9 +1046,10 @@ function setupSettings() {
     const isCheck = input.type === 'checkbox';
     if (isCheck) input.checked = settings[key]; else input.value = settings[key];
     const ev = input.tagName === 'SELECT' || isCheck ? 'change' : 'input';
-    input.addEventListener(ev, async () => {
+    input.addEventListener(ev, () => {
       settings[key] = isCheck ? input.checked : parse(input.value);
-      await sync.set({ [key]: settings[key] });
+      // The page follows the control at once; continuous input is saved in batches.
+      if (ev === 'input') syncLater({ [key]: settings[key] }); else sync.set({ [key]: settings[key] });
       onChange?.();
     });
   };
@@ -1066,6 +1144,7 @@ function applyWidgetPositions() {
     w.style.top = pos ? `${pos.y * 100}vh` : '';
     w.style.width = pos && pos.w ? `${pos.w * 100}vw` : '';
   }
+  keepWidgetsOnScreen();
 }
 
 // Opens a floating panel beside its anchor, kept inside the window.
@@ -1096,13 +1175,24 @@ function freezeWidget(w) {
   return pos;
 }
 
+// Positions before editing began, and whether anything was moved or resized
+// since. Leaving edit mode without changes restores them, so merely opening
+// the editor does not take the page out of its responsive layout.
+let editStart = null;
+let layoutChanged = false;
+let gridWidthAtStart = 0;
+
 function setEditing(on) {
+  if (on === editing) return;
   editing = on;
   document.body.classList.toggle('editing', on);
   $('editBar').hidden = !on;
   $('editLayoutBtn').classList.toggle('active', on);
   if (on) {
     for (const id of ['todoPanel', 'notesPanel', 'focusPanel', 'settings', 'forecast']) $(id).hidden = true;
+    editStart = structuredClone(settings.widgetPos);
+    layoutChanged = false;
+    gridWidthAtStart = widgetEl('grid').getBoundingClientRect().width;
     const all = { ...settings.widgetPos };
     for (const w of document.querySelectorAll('[data-widget]')) {
       const name = w.dataset.widget;
@@ -1113,9 +1203,28 @@ function setEditing(on) {
     applyWidgetPositions();
   } else {
     // Read back the grid width in case it was resized by its corner.
-    if (settings.widgetPos.grid) settings.widgetPos.grid.w = widgetEl('grid').getBoundingClientRect().width / innerWidth;
+    const gridWidth = widgetEl('grid').getBoundingClientRect().width;
+    if (Math.abs(gridWidth - gridWidthAtStart) > 2) layoutChanged = true;
+    if (layoutChanged) {
+      // Once one widget leaves the flow the others keep their frozen places,
+      // otherwise they would jump to fill the gap.
+      if (settings.widgetPos.grid) settings.widgetPos.grid.w = gridWidth / innerWidth;
+    } else {
+      settings.widgetPos = editStart || {};
+    }
     applyWidgetPositions();
-    sync.set({ widgetPos: settings.widgetPos });
+    if (JSON.stringify(settings.widgetPos) !== JSON.stringify(editStart)) sync.set({ widgetPos: settings.widgetPos });
+    editStart = null;
+  }
+}
+
+// A widget placed near the right or bottom edge can end up outside a smaller
+// window; it is moved back inside without changing the saved position.
+function keepWidgetsOnScreen() {
+  for (const w of document.querySelectorAll('[data-widget].placed')) {
+    const r = w.getBoundingClientRect();
+    if (r.width && r.right > innerWidth) w.style.left = `${Math.max(0, innerWidth - r.width)}px`;
+    if (FIXED_WIDGETS.has(w.dataset.widget) && r.height && r.bottom > innerHeight) w.style.top = `${Math.max(0, innerHeight - r.height)}px`;
   }
 }
 
@@ -1126,9 +1235,16 @@ function setupLayoutEditing() {
   $('editDone').addEventListener('click', () => setEditing(false));
   $('resetPositions').addEventListener('click', async () => {
     settings.widgetPos = {};
+    editStart = {};
+    layoutChanged = true;
     await sync.set({ widgetPos: {} });
     setEditing(false);
     applyWidgetPositions();
+  });
+  let resizeTimer;
+  addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => { if (!editing) applyWidgetPositions(); }, 150);
   });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && editing) setEditing(false); });
 
@@ -1174,6 +1290,7 @@ function setupLayoutEditing() {
     const r = w.getBoundingClientRect();
     const prev = settings.widgetPos[w.dataset.widget] || {};
     settings.widgetPos[w.dataset.widget] = { ...prev, x: r.left / innerWidth, y: (r.top + (fixed ? 0 : scrollY)) / innerHeight };
+    layoutChanged = true;
     applyWidgetPositions();
     sync.set({ widgetPos: settings.widgetPos });
   };
@@ -1210,4 +1327,5 @@ function setupLayoutEditing() {
   setupTodos();
   setupNotes();
   setupFocus();
+  setupCrossTabSync();
 })();

@@ -9,7 +9,7 @@ The extension is completely free: no paid tier, no ads, no account.
 
 ## 1. Package
 
-Upload `store/new-tab-most-visited-2.5.0.zip`.
+Upload `store/new-tab-most-visited-3.0.0.zip`.
 
 ## 2. Store listing
 
@@ -51,11 +51,11 @@ Upload `store/new-tab-most-visited-2.5.0.zip`.
 | `history` | Core feature. The extension reads the browsing history locally to count visits per site and show the user's most visited sites on the new tab page. It also finds the user's own weather-radar site in history to link it from the weather widget. History is processed only on the device and is never uploaded. |
 | `storage` | Saves the user's settings, pinned and hidden sites, to-do list and notes, plus caches for the site list, weather and background photo list, so the new tab opens instantly. |
 | `unlimitedStorage` | Lets the user set their own background image, which is stored locally and can exceed the default local storage quota. |
-| `tabs` | Reads the addresses of open tabs only to leave sites that are already open out of the most-visited grid until their tab is closed. Tab data is used on the device only and never stored or sent. |
+| `tabs` | Reads the addresses and titles of open tabs locally to hide sites already open in other tabs and to let users switch directly to matching open tabs from the search bar (Quick Jump). Tab data stays on the device and is never stored or sent. |
 | `favicon` | Shows each tile with the site's icon from Chrome's own favicon cache, so most icons load locally without contacting an icon service. |
 | `geolocation` | Gets the device location only to show local weather; coordinates are rounded to about 1 km before they are sent to the weather services. Users can type a city instead or turn the weather widget off. |
 | Host: `https://www.bing.com/HPImageArchive.aspx*` | Downloads the list of Bing's daily photos, used as the background picture. |
-| Host: `https://api.open-meteo.com/*`, `https://geocoding-api.open-meteo.com/*` | Current weather, hourly and 7-day forecast, and searching a city the user types. |
+| Host: `https://api.open-meteo.com/*`, `https://geocoding-api.open-meteo.com/*` | Current weather, hourly (24h/48h), 7-day and 14-day forecasts, and searching cities the user adds. |
 | Host: `https://api.bigdatacloud.net/*` | Converts the device location into a city name shown next to the temperature. |
 | Host: `https://www.google.com/s2/favicons*`, `https://t0–t3.gstatic.com/faviconV2*`, `https://icons.duckduckgo.com/*` | Loads site icons for the tiles. Only the domain name of each tile is sent, and never for local, LAN or intranet hosts. Chrome's own favicon cache does not know sites imported from another browser, so these services are needed for icons. |
 

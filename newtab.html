@@ -10,31 +10,117 @@
   <div id="bg"></div>
 
   <!-- Weather (top left) -->
-  <button id="weather" class="weather" type="button" data-widget="weather" hidden aria-expanded="false" aria-controls="forecast">
-    <span id="wIcon" class="w-icon"></span>
-    <span class="w-text">
-      <span id="wTemp" class="w-temp"></span>
-      <span id="wPlace" class="w-place"></span>
-    </span>
-  </button>
+  <div id="weather" class="weather" data-widget="weather" hidden tabindex="0" role="button" aria-expanded="false" aria-controls="forecast">
+    <div id="wMain" class="w-main">
+      <span id="wIcon" class="w-icon"></span>
+      <span class="w-text">
+        <span id="wTemp" class="w-temp"></span>
+        <span id="wPlace" class="w-place"></span>
+      </span>
+    </div>
+    <div id="wExtra" class="w-extra" hidden></div>
+  </div>
+
+  <!-- Weather right-click context menu -->
+  <div id="weatherMenu" class="wx-menu" hidden role="menu" aria-label="Weather options">
+    <div class="wx-menu-title">Forecast view</div>
+    <button type="button" class="wx-opt" data-view="current" role="menuitemradio"><span>Compact (current)</span><span class="wx-check">✓</span></button>
+    <button type="button" class="wx-opt" data-view="hourly" role="menuitemradio"><span>Hourly (24h)</span><span class="wx-check">✓</span></button>
+    <button type="button" class="wx-opt" data-view="daily7" role="menuitemradio"><span>7 days</span><span class="wx-check">✓</span></button>
+    <button type="button" class="wx-opt" data-view="long14" role="menuitemradio"><span>Long-term (14 days)</span><span class="wx-check">✓</span></button>
+    <label class="wx-toggle"><input id="wxTransparent" type="checkbox"> Transparent background</label>
+    <div class="wx-sep"></div>
+    <div class="wx-menu-title">Locations</div>
+    <div id="wxLocations" class="wx-locations"></div>
+    <label id="wxShowAllRow" class="wx-toggle" hidden><input id="wxShowAll" type="checkbox"> Show all locations</label>
+    <form id="wxAddForm" class="wx-add-form" autocomplete="off">
+      <input id="wxAddInput" type="text" placeholder="Add city…" maxlength="60">
+      <button type="submit" title="Add location">+</button>
+    </form>
+    <div id="wxAddResults" class="wx-add-results" hidden></div>
+  </div>
 
   <section id="forecast" class="forecast" hidden aria-label="Weather forecast">
     <header>
       <strong id="fPlace"></strong>
-      <a id="radar" href="https://www.google.com/search?q=weather+radar">Weather &amp; Radar ↗</a>
+      <a id="radar" href="https://www.google.com/search?q=weather+radar" target="_blank" rel="noopener">Weather &amp; Radar ↗</a>
     </header>
-    <h3>Hourly</h3>
+    <div id="fTabs" class="f-tabs" hidden></div>
+    <h3 id="hourlyTitle">Hourly</h3>
     <div id="hourly" class="hourly"></div>
-    <h3>Next 7 days</h3>
+    <h3 id="dailyTitle">Next 7 days</h3>
     <div id="daily" class="daily"></div>
   </section>
 
   <!-- Focus timer pill (top right, visible while running) -->
   <button id="focusPill" class="focus-pill" type="button" data-widget="focus" hidden title="Focus timer"></button>
 
+  <!-- Permanent To-do widget -->
+  <section id="todoWidget" class="todo-widget" data-widget="todo" hidden aria-label="To-do widget">
+    <header class="tw-head">
+      <span class="tw-title">To-do</span>
+      <span id="twCount" class="tw-count"></span>
+    </header>
+    <form id="todoWidgetForm" class="tw-form" autocomplete="off">
+      <input id="todoWidgetInput" type="text" placeholder="Add a task…" maxlength="200">
+    </form>
+    <ul id="todoWidgetList" class="tw-list"></ul>
+    <div id="twEmpty" class="tw-empty" hidden>No tasks yet</div>
+  </section>
+
+  <!-- To-do right-click context menu -->
+  <div id="todoMenu" class="wx-menu" hidden role="menu" aria-label="To-do options">
+    <div class="wx-menu-title">To-do widget</div>
+    <label class="wx-toggle"><input id="tmShowDone" type="checkbox"> Show completed tasks</label>
+    <label class="wx-toggle"><input id="tmShowInput" type="checkbox"> Show input box</label>
+    <label class="wx-toggle"><input id="tmTransparent" type="checkbox"> Transparent background</label>
+    <div id="tmClearSep" class="wx-sep" hidden></div>
+    <button id="tmClear" type="button" class="wx-opt wx-danger" hidden><span>Clear completed</span></button>
+  </div>
+
+  <!-- Permanent Notes widget -->
+  <section id="notesWidget" class="notes-widget" data-widget="notes" hidden aria-label="Notes widget">
+    <header class="tw-head">
+      <span class="tw-title">Notes</span>
+      <span id="nwSaved" class="tw-count"></span>
+    </header>
+    <textarea id="notesWidgetArea" class="nw-area" placeholder="Write anything…"></textarea>
+  </section>
+
+  <!-- Notes right-click context menu -->
+  <div id="notesMenu" class="wx-menu" hidden role="menu" aria-label="Notes options">
+    <div class="wx-menu-title">Notes widget</div>
+    <label class="wx-toggle"><input id="nmTransparent" type="checkbox"> Transparent background</label>
+  </div>
+
+  <!-- Sites grid / icon right-click context menu -->
+  <div id="gridMenu" class="wx-menu" hidden role="menu" aria-label="Site options">
+    <div id="gmTileSection" hidden>
+      <div id="gmTileTitle" class="wx-menu-title">Site</div>
+      <form id="gmRenameForm" class="wx-add-form" autocomplete="off">
+        <input id="gmRenameInput" type="text" placeholder="Custom name…" maxlength="40">
+        <button type="submit" title="Save name">✓</button>
+      </form>
+      <button id="gmPinBtn" type="button" class="wx-opt"><span>Pin site</span></button>
+      <button id="gmHideBtn" type="button" class="wx-opt wx-danger"><span>Hide site</span></button>
+      <div class="wx-sep"></div>
+    </div>
+    <div class="wx-menu-title">Add custom site</div>
+    <form id="gmAddForm" class="wx-add-stack" autocomplete="off">
+      <input id="gmAddUrl" type="text" placeholder="URL (e.g. youtube.com)" maxlength="200">
+      <div class="wx-add-form">
+        <input id="gmAddTitle" type="text" placeholder="Name (optional)" maxlength="40">
+        <button type="submit" title="Add site">+</button>
+      </div>
+    </form>
+    <div id="gmAddMsg" class="wx-add-msg" hidden></div>
+  </div>
+
   <main>
     <section id="clockBox" class="clock-box" data-widget="clock">
       <div id="clock" class="clock"></div>
+      <div id="clockTz" class="clock-tz" hidden></div>
+      <div id="clockDate" class="clock-date" hidden></div>
       <div id="greeting" class="greeting"></div>
     </section>
 
@@ -47,9 +133,14 @@
       <button data-mode="maps">Maps</button>
     </nav>
 
-    <form id="search" autocomplete="off">
-      <span id="engineMark" class="g" aria-hidden="true">G</span>
-      <input id="q" type="search" placeholder="Search Google or type a URL" autofocus>
+    <form id="search" class="search-form" autocomplete="off">
+      <button id="engineBtn" class="engine-btn" type="button" title="Search engine &amp; options" aria-haspopup="menu" aria-expanded="false">
+        <span id="engineMark" class="g" aria-hidden="true">G</span>
+        <svg class="caret" width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 4.5L6 7.5L9 4.5"/>
+        </svg>
+      </button>
+      <input id="q" class="search-input" type="search" placeholder="Search Google or type a URL" autofocus>
     </form>
     </div>
 
@@ -57,27 +148,89 @@
     <p id="empty" hidden>Your history is empty so far. Your most visited sites will appear here after you import history or browse for a while.</p>
   </main>
 
+  <div id="extraWidgets"></div>
+
+  <!-- Clock right-click context menu -->
+  <div id="clockMenu" class="wx-menu" hidden role="menu" aria-label="Clock options">
+    <div class="wx-menu-title">Clock</div>
+    <div class="wx-input-row">
+      <select id="cmTz" class="wx-select" aria-label="Time zone"></select>
+    </div>
+    <div class="wx-input-row">
+      <select id="cmFont" class="wx-select" aria-label="Clock font">
+        <option value="default">Font: Modern</option>
+        <option value="thin">Font: Light</option>
+        <option value="serif">Font: Classic (Serif)</option>
+        <option value="mono">Font: Mono</option>
+      </select>
+    </div>
+    <label class="wx-toggle"><input id="cm24" type="checkbox"> 24-hour clock</label>
+    <label class="wx-toggle"><input id="cmSeconds" type="checkbox"> Show seconds</label>
+    <label class="wx-toggle"><input id="cmDate" type="checkbox"> Show date</label>
+    <label class="wx-toggle"><input id="cmGreeting" type="checkbox"> Show greeting</label>
+    <div class="wx-sep"></div>
+    <div class="wx-menu-title">Greeting / label</div>
+    <div class="wx-input-row">
+      <input id="cmName" type="text" maxlength="40" placeholder="Optional name…">
+    </div>
+  </div>
+
+  <!-- Search bar dropdown menu -->
+  <div id="searchMenu" class="wx-menu" hidden role="menu" aria-label="Search options">
+    <div class="wx-menu-title">Search engine</div>
+    <div id="searchEngineList" class="wx-engines"></div>
+    <div class="wx-sep"></div>
+    <label class="wx-toggle"><input id="smTabs" type="checkbox"> Show search tabs (Web, Images…)</label>
+    <label class="wx-toggle"><input id="smTransparent" type="checkbox"> Transparent background</label>
+  </div>
+
   <a id="credit" target="_blank" rel="noopener" hidden></a>
 
   <!-- Dock (bottom right) -->
   <nav id="dock" class="dock" data-widget="dock" aria-label="Tools">
-    <button class="dock-btn" data-panel="todoPanel" title="To-do">✓</button>
+    <button class="dock-btn" data-panel="todoPanel" title="To-do" aria-label="To-do">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3 6.5l1.5 1.5L7.5 5"/>
+        <path d="M11 6.5h10"/>
+        <path d="M3 12.5l1.5 1.5L7.5 11"/>
+        <path d="M11 12.5h10"/>
+        <path d="M3 18.5l1.5 1.5L7.5 17"/>
+        <path d="M11 18.5h10"/>
+      </svg>
+    </button>
     <button class="dock-btn" data-panel="notesPanel" title="Notes">✎</button>
     <button class="dock-btn" data-panel="focusPanel" title="Focus timer">⏱</button>
     <button id="editLayoutBtn" class="dock-btn" type="button" title="Edit layout: move the clock, weather, search, icons and buttons">✥</button>
-    <button class="dock-btn" data-panel="settings" title="Settings" aria-label="Settings">⚙</button>
+    <button class="dock-btn" data-panel="settings" title="Settings" aria-label="Settings">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </button>
+    <button id="dockToggle" class="dock-btn dock-toggle" type="button" title="Hide toolbar" aria-label="Hide toolbar">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M4 6l4 4 4-4"/>
+      </svg>
+    </button>
   </nav>
 
   <!-- Layout editing toolbar -->
   <div id="editBar" class="edit-bar" hidden>
-    <span>Drag anything to move it · drag the icon grid's corner ◢ to change its width</span>
+    <span>Drag to move · blue handle to resize · hold Alt to disable snap · Esc or Done</span>
+    <button id="editUndo" type="button" disabled title="Undo last change (Ctrl+Z)">↶ Undo</button>
     <button id="resetPositions" type="button">Reset positions</button>
-    <button id="editDone" type="button" class="primary">Done</button>
+    <button id="editDone" type="button" class="primary">Done (Esc)</button>
   </div>
 
   <!-- To-do (free) -->
   <section id="todoPanel" class="panel" hidden aria-label="To-do">
-    <header><h2>To-do</h2><button class="x" data-close aria-label="Close">×</button></header>
+    <header>
+      <h2>To-do</h2>
+      <div class="header-actions">
+        <button id="todoPinBtn" class="pin-panel-btn" type="button" title="Pin to page as a permanent widget">📌 Pin</button>
+        <button class="x" data-close aria-label="Close">×</button>
+      </div>
+    </header>
     <form id="todoForm" class="row-form">
       <input id="todoInput" type="text" placeholder="Add a task and press Enter" maxlength="200">
     </form>
@@ -85,9 +238,15 @@
     <button id="todoClear" class="link-btn" type="button">Clear completed</button>
   </section>
 
-  <!-- Notes (Pro) -->
+  <!-- Notes -->
   <section id="notesPanel" class="panel" hidden aria-label="Notes">
-    <header><h2>Notes</h2><button class="x" data-close aria-label="Close">×</button></header>
+    <header>
+      <h2>Notes</h2>
+      <div class="header-actions">
+        <button id="notesPinBtn" class="pin-panel-btn" type="button" title="Pin to page as a permanent widget">📌 Pin</button>
+        <button class="x" data-close aria-label="Close">×</button>
+      </div>
+    </header>
     <textarea id="notes" placeholder="Write anything… it saves automatically."></textarea>
     <p id="notesSaved" class="hint"></p>
   </section>
@@ -109,8 +268,37 @@
   <aside id="settings" class="panel settings" hidden>
     <header>
       <h2>Settings</h2>
-      <button class="x" data-close aria-label="Close">×</button>
+      <div class="header-actions">
+        <a id="bmcLink" class="bmc-btn" href="https://buymeacoffee.com/slavozett" target="_blank" rel="noopener" title="Buy me a coffee" aria-label="Support development on Buy Me a Coffee">
+          <span>Support</span>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M17 8h1a4 4 0 1 1 0 8h-1"/>
+            <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/>
+            <line x1="6" y1="2" x2="6" y2="4"/>
+            <line x1="10" y1="2" x2="10" y2="4"/>
+            <line x1="14" y1="2" x2="14" y2="4"/>
+          </svg>
+        </a>
+        <button class="x" data-close aria-label="Close">×</button>
+      </div>
     </header>
+
+    <fieldset>
+      <legend>Hints</legend>
+      <ul class="settings-tip">
+        <li><strong>Right-click</strong> any widget or icon for its options.</li>
+        <li>Use <strong>✥</strong> to move, resize, duplicate or hide widgets. Hold <strong>Alt</strong> to overlap freely.</li>
+        <li><strong>Drag icons</strong> to reorder; hover to pin (📌) or hide (×).</li>
+      </ul>
+      <div id="hiddenWidgetsRow" class="hidden-widgets" hidden>
+        <span class="hint">Hidden widgets:</span>
+        <div class="hidden-widgets-btns">
+          <button id="restoreClock" type="button" hidden>+ Clock</button>
+          <button id="restoreSearch" type="button" hidden>+ Search</button>
+          <button id="restoreWeather" type="button" hidden>+ Weather</button>
+        </div>
+      </div>
+    </fieldset>
 
     <fieldset>
       <legend>Sites</legend>
@@ -127,93 +315,83 @@
           <option value="recent">Recently visited</option>
         </select>
       </label>
-      <label>History period
-        <select id="period">
-          <option value="0">All history</option>
-          <option value="365">Last year</option>
-          <option value="90">Last 3 months</option>
-          <option value="30">Last month</option>
-        </select>
-      </label>
-      <label>Group by
-        <select id="groupBy">
-          <option value="host">Site (domain)</option>
-          <option value="url">Exact address</option>
-        </select>
-      </label>
-      <label class="row"><input id="newTab" type="checkbox"> Open sites in a new tab</label>
-      <label class="row"><input id="hideOpen" type="checkbox"> Hide sites that are open in other tabs</label>
-      <p class="hint">Drag icons to rearrange them. Hover over an icon: 📌 keeps it on the page, × hides it.</p>
-      <button id="resetLayout" type="button">Reset icon order to most visited</button>
-      <button id="editLayoutSettings" type="button">Move page elements (clock, weather, search…)</button>
-      <button id="unhideAll" type="button">Show all hidden sites (<span id="hiddenCount">0</span>)</button>
-    </fieldset>
-
-    <fieldset>
-      <legend>Clock &amp; search</legend>
-      <label class="row"><input id="showClock" type="checkbox"> Show clock and greeting</label>
-      <label class="row"><input id="clock24" type="checkbox"> 24-hour clock</label>
-      <label>Your name (for the greeting)
-        <input id="userName" type="text" maxlength="40" placeholder="optional">
-      </label>
-      <label>Search engine
-        <select id="engine">
-          <option value="google">Google</option>
-          <option value="bing">Bing</option>
-          <option value="ddg">DuckDuckGo</option>
-        </select>
-      </label>
-    </fieldset>
-
-    <fieldset>
-      <legend>Weather</legend>
-      <label class="row"><input id="weatherOn" type="checkbox"> Show weather</label>
-      <label>City (empty = use my location)
-        <input id="city" type="text" placeholder="e.g. Bratislava">
-      </label>
-      <span id="cityStatus" class="hint"></span>
+      <div class="settings-row-2">
+        <label>History period
+          <select id="period">
+            <option value="0">All history</option>
+            <option value="365">Last year</option>
+            <option value="90">Last 3 months</option>
+            <option value="30">Last month</option>
+          </select>
+        </label>
+        <label>Group by
+          <select id="groupBy">
+            <option value="host">Site (domain)</option>
+            <option value="url">Exact URL</option>
+          </select>
+        </label>
+      </div>
+      <label class="row"><input id="newTab" type="checkbox"> Open sites &amp; search in a new tab</label>
+      <label class="row"><input id="hideOpen" type="checkbox"> Hide sites open in other tabs</label>
+      <label class="row"><input id="showRecent" type="checkbox"> Show "Recently visited" row</label>
+      <label class="row"><input id="iconTransparent" type="checkbox"> Transparent icon background</label>
+      <div class="settings-actions">
+        <button id="resetLayout" type="button">Reset icon order</button>
+        <button id="unhideAll" type="button">Unhide all (<span id="hiddenCount">0</span>)</button>
+      </div>
     </fieldset>
 
     <fieldset>
       <legend>Background</legend>
-      <select id="bgMode">
+      <select id="bgMode" aria-label="Background mode">
         <option value="nature">Nature photo</option>
         <option value="custom">My own image</option>
-        <option value="none">No image</option>
+        <option value="none">Gradient (no image)</option>
       </select>
-      <label>New photo
+      <label id="bgGradientRow" hidden>Gradient
+        <select id="bgGradient">
+          <option value="forest">Forest</option>
+          <option value="ocean">Ocean</option>
+          <option value="sunset">Sunset</option>
+          <option value="midnight">Midnight</option>
+          <option value="aurora">Aurora</option>
+          <option value="slate">Slate</option>
+        </select>
+      </label>
+      <label id="bgEveryRow">New photo
         <select id="bgEvery">
           <option value="day">Every day</option>
           <option value="hour">Every hour</option>
           <option value="tab">Every new tab</option>
         </select>
       </label>
-      <label>Upload image
+      <label id="bgFileRow" hidden>Choose image
         <input id="bgFile" type="file" accept="image/*">
       </label>
-    </fieldset>
-
-    <fieldset>
-      <legend>Appearance</legend>
-      <label>Accent colour
-        <input id="accent" type="color">
-      </label>
-      <label>Darken photo: <output id="dimOut"></output>
-        <input id="dim" type="range" min="0" max="70" step="5">
-      </label>
-      <label>Blur photo: <output id="blurOut"></output>
-        <input id="blur" type="range" min="0" max="12" step="1">
-      </label>
+      <div id="bgPhotoFx" class="settings-group">
+        <label>Darken photo: <output id="dimOut"></output>
+          <input id="dim" type="range" min="0" max="70" step="5">
+        </label>
+        <label>Blur photo: <output id="blurOut"></output>
+          <input id="blur" type="range" min="0" max="12" step="1">
+        </label>
+      </div>
+      <label id="bgCreditRow" class="row"><input id="showCredit" type="checkbox"> Show photo info</label>
     </fieldset>
 
     <fieldset>
       <legend>Backup</legend>
-      <button id="exportBtn" type="button">Export settings, pins, to-dos and notes</button>
-      <label>Import from file
+      <button id="exportBtn" type="button">Export backup</button>
+      <label>Import backup
         <input id="importFile" type="file" accept="application/json,.json">
       </label>
+      <p class="hint">Includes settings, pins, to-dos and notes.</p>
       <span id="backupStatus" class="hint"></span>
     </fieldset>
+
+    <footer class="settings-footer">
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLSdvyL7WTLlbxJmIdfkfGK4HXSYhbBezK88N15kHGyfABcfoSw/viewform" target="_blank" rel="noopener">Suggestions &amp; bug reports</a>
+    </footer>
 
   </aside>
 

@@ -18,24 +18,17 @@ After editing files, click ↻ on the extension card in `chrome://extensions`.
 
 ## Features
 
-- **Most visited grid** built from history, 8–120 sites, real site icons. Sorted **Smart** by default:
-  each visit counts less as it gets older (half-life 14 days), so sites you use now come first;
-  also available: *Most visited (all time)* and *Recently visited*.
+- **Most visited grid** built from history, 8–120 sites, real site icons, optional transparent icon background, and optional "Recently visited" strip. Sorted **Smart** by default (*Most visited* and *Recently visited* also available).
+- **Right-click site options**: rename any site, pin/unpin, hide, or add custom sites.
 - Sites **open in other tabs are hidden** until their tab is closed (can be turned off).
 - **Drag and drop** icons to arrange your own layout (Settings → Reset icon order restores the ranking).
-- **Free layout**: the ✥ button turns on edit mode; move the clock, weather, search box, icon grid,
-  tool buttons and focus timer anywhere, and drag the grid's corner to change its width.
-  Positions are stored relative to the window size and synced. **Reset positions** restores the default.
-- **Pin** sites to keep them on the page (📌 on hover); **hide** sites (× on hover).
-- **Clock and greeting** (12/24-hour, optional name).
-- **Search** with Google, Bing or DuckDuckGo: web, images, news, video, maps.
-- **Weather** for your location or a city: current, next 24 hours and 7 days;
-  links to your own "Weather & Radar" site from history.
-- **Background**: nature photo daily, hourly or every tab, your own image, or none.
-- **Appearance**: accent colour, photo dimming and blur.
-- **To-do list**, **notes** and a **focus timer** (25/50-minute focus, 5-minute break).
-- **Backup**: export and import settings, pins, to-dos and notes.
-- Settings sync across your computers through your Chrome profile.
+- **Free layout editor (`✥`)**: move, resize, duplicate or hide widgets with smart snapping, alignment guides, Undo (`Ctrl+Z`), and `Alt` for free overlap. Positions sync across screens.
+- **World clock & greeting**: 40+ timezones, 4 fonts, 12/24-hour, optional seconds, date and custom label; duplicate clocks for multiple cities.
+- **Search & Quick Jump**: 10 search engines (Google, Bing, DuckDuckGo, Brave, Perplexity, Ecosia, Startpage, Qwant, Yahoo, Yandex), instant jump to open tabs & saved sites, optional search tabs and transparent style.
+- **Weather**: current, hourly (24h/48h), 7-day and 14-day forecasts, multiple cities, transparent style, and link to your own "Weather & Radar" site.
+- **Background**: nature photo daily, hourly or every tab, your own image, or 6 gradients, with photo dimming, blur and optional photo info.
+- **To-do list, Notes & Focus timer**: pin To-do and Notes directly onto the page (with transparent option), plus a 25/50-minute focus timer and collapsible toolbar.
+- **Backup & Sync**: export/import JSON backup (settings, pins, to-dos and notes) + Chrome profile sync.
 
 ## Files
 

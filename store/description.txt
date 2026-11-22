@@ -1,26 +1,22 @@
-Your most visited sites, automatically. Open a new tab and see the sites you really use, built from your own browsing history and ranked by how often you visit them. Nothing to set up and no bookmarks to arrange. It even picks up history you imported from Firefox or another browser.
+Your most visited sites, automatically — plus a clean, fully customizable dashboard. Open a new tab and see the sites you actually use, ranked from your browsing history (including history imported from other browsers). Nothing to set up, no account required.
 
 ★ FEATURES
-• Most visited grid: up to 120 sites from your history, with real site icons
-• Drag and drop icons to arrange your own layout
-• Make the page yours: move the clock, weather, search box, icons and buttons anywhere
-• Pin favourites so they always stay; hide any site with one click
-• Beautiful nature photos: a new one every day, every hour or every tab, or use your own image
-• Clock with a personal greeting
-• Weather for your location or any city: hourly forecast for 24 hours and a 7-day forecast
-• Search with Google, Bing or DuckDuckGo: web, images, news, video and maps
-• To-do list, notes and a focus timer (25/50-minute sessions and breaks)
-• Accent colour, photo dimming and blur
-• Backup: export and import your settings, pins, to-dos and notes
-• Settings sync across your computers through your Chrome profile
+• Most visited grid: up to 120 sites with real icons, smart ranking, drag-and-drop ordering, pin/hide, right-click to rename or add custom sites, optional "Recently visited" row and transparent icons
+• Auto-hide open tabs: temporarily hides sites already open in other tabs
+• Free layout editor (✥): move, resize, duplicate or hide widgets with smart snapping, alignment guides, Undo (Ctrl+Z) and Alt for free placement
+• Search & Quick Jump: 10 search engines (Google, Bing, DuckDuckGo, Brave, Perplexity, Ecosia, Startpage, Qwant, Yahoo, Yandex), instant jump to open tabs and saved sites as you type, transparent style
+• World clock: 40+ timezones, 4 fonts, optional seconds, date and greeting — duplicate clocks for multiple cities
+• Weather: current, hourly (24h/48h), 7-day and 14-day forecasts, multiple cities and transparent style
+• To-do, Notes & Focus timer: pin To-do and Notes directly onto the page (with optional transparent background), plus a 25/50-minute Focus timer and collapsible toolbar
+• Backgrounds: nature photos (daily, hourly or every tab), your own image or 6 gradients, with dimming and blur
+• Sync & Backup: Chrome profile sync plus one-click JSON export/import
 
-100% free. No ads, no account, no paid version.
+100% free. No ads, no account, no paywall.
 
 🔒 PRIVATE BY DESIGN
-Your history is read on your device to build the grid and is never uploaded. No ads, no analytics, no tracking. To-dos and notes stay in local storage. Only site domain names are sent to an icon service to draw the icons, and location is used only for the weather (you can type a city instead or turn weather off).
+Your browsing history and open tabs stay on your device and are never uploaded. No ads, analytics or tracking. To-dos and notes are stored locally. Only public domain names are sent to favicon services when needed, and rounded location (~1 km) is used solely for weather (or pick cities manually / hide weather).
 
-Tips
-• Drag icons to rearrange them. Hover over an icon: 📌 pins it, × hides it.
-• Click ✥ (bottom right) to move the clock, weather, search and other elements; Done saves the layout.
-• The buttons at the bottom right open the to-do list, notes, focus timer, layout editor and Settings.
-• Click the weather to see the hourly and 7-day forecast.
+💡 QUICK TIPS
+• Right-click any widget or site icon for its options.
+• Click ✥ (bottom right) to move, resize, duplicate or hide widgets; hold Alt to overlap freely.
+• Drag icons to reorder; hover to pin (📌) or hide (×).

@@ -1,8 +1,8 @@
 # New Tab – Most Visited
 
-A free Chrome new tab page with a grid of your most visited sites (from browser
-history), a nature photo background, weather with hourly and 7-day forecasts,
-a clock, a to-do list, notes and a focus timer. No ads, no account, no paid tier.
+A clean, customizable Chrome new tab page built around the sites you actually use. Automatically builds a grid of your most visited websites from browser history (including imported history), paired with world clock, weather forecasts, Quick Jump search, to-do list, notes, and a focus timer. Completely free — no ads, no account, no paid tier.
+
+![New Tab – Most Visited v3.0.0](store/screenshot-1-grid.png)
 
 **Install from the Chrome Web Store:** https://chromewebstore.google.com/detail/pfbikbofncoonngdodifmipkknigjfin
 
@@ -18,17 +18,21 @@ After editing files, click ↻ on the extension card in `chrome://extensions`.
 
 ## Features
 
-- **Most visited grid** built from history, 8–120 sites, real site icons, optional transparent icon background, and optional "Recently visited" strip. Sorted **Smart** by default (*Most visited* and *Recently visited* also available).
-- **Right-click site options**: rename any site, pin/unpin, hide, or add custom sites.
-- Sites **open in other tabs are hidden** until their tab is closed (can be turned off).
-- **Drag and drop** icons to arrange your own layout (Settings → Reset icon order restores the ranking).
-- **Free layout editor (`✥`)**: move, resize, duplicate or hide widgets with smart snapping, alignment guides, Undo (`Ctrl+Z`), and `Alt` for free overlap. Positions sync across screens.
-- **World clock & greeting**: 40+ timezones, 4 fonts, 12/24-hour, optional seconds, date and custom label; duplicate clocks for multiple cities.
-- **Search & Quick Jump**: 10 search engines (Google, Bing, DuckDuckGo, Brave, Perplexity, Ecosia, Startpage, Qwant, Yahoo, Yandex), instant jump to open tabs & saved sites, optional search tabs and transparent style.
-- **Weather**: current, hourly (24h/48h), 7-day and 14-day forecasts, multiple cities, transparent style, and link to your own "Weather & Radar" site.
-- **Background**: nature photo daily, hourly or every tab, your own image, or 6 gradients, with photo dimming, blur and optional photo info.
-- **To-do list, Notes & Focus timer**: pin To-do and Notes directly onto the page (with transparent option), plus a 25/50-minute focus timer and collapsible toolbar.
-- **Backup & Sync**: export/import JSON backup (settings, pins, to-dos and notes) + Chrome profile sync.
+- **Most visited grid**: 8 to 120 sites with real icons, smart recency-weighted ranking, drag-and-drop ordering, pinning, hiding, custom names, optional "Recently visited" row, and transparent icon style.
+- **Open-tab awareness**: automatically hides sites that are already open in another tab.
+- **Free layout editor (`✥`)**: move, resize, duplicate, or hide widgets with snapping, alignment guides, undo (`Ctrl+Z`), and `Alt` for unrestricted placement.
+- **Search & Quick Jump**: 10 search engines (Google, Bing, DuckDuckGo, Brave, Perplexity, Ecosia, Startpage, Qwant, Yahoo, Yandex), instant switching to open tabs and saved sites as you type, and transparent style.
+- **World clock**: 40+ time zones, 4 font styles, optional seconds, date, and greeting, with support for multiple clocks.
+- **Weather**: current conditions, hourly (24h/48h), 7-day, and 14-day forecasts, multiple cities, transparent style, and quick link to Weather & Radar.
+- **Productivity tools**: pinnable To-do and Notes widgets, Focus timer (25/50-minute sessions and breaks), and a collapsible toolbar.
+- **Backgrounds**: daily, hourly, or per-tab nature photos, custom image upload, or 6 gradients, with dimming and blur controls.
+- **Sync & backup**: Chrome profile sync plus JSON export and import.
+
+## Screenshots
+
+| Weather forecast | Layout editor & widgets | Settings |
+|---|---|---|
+| ![Forecast](store/screenshot-2-forecast.png) | ![Layout editor](store/screenshot-3-tools.png) | ![Settings](store/screenshot-4-settings.png) |
 
 ## Files
 

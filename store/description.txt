@@ -1,22 +1,19 @@
-Your most visited sites, automatically — plus a clean, fully customizable dashboard. Open a new tab and see the sites you actually use, ranked from your browsing history (including history imported from other browsers). Nothing to set up, no account required.
+A clean, customizable new tab page built around the sites you actually use.
 
-★ FEATURES
-• Most visited grid: up to 120 sites with real icons, smart ranking, drag-and-drop ordering, pin/hide, right-click to rename or add custom sites, optional "Recently visited" row and transparent icons
-• Auto-hide open tabs: temporarily hides sites already open in other tabs
-• Free layout editor (✥): move, resize, duplicate or hide widgets with smart snapping, alignment guides, Undo (Ctrl+Z) and Alt for free placement
-• Search & Quick Jump: 10 search engines (Google, Bing, DuckDuckGo, Brave, Perplexity, Ecosia, Startpage, Qwant, Yahoo, Yandex), instant jump to open tabs and saved sites as you type, transparent style
-• World clock: 40+ timezones, 4 fonts, optional seconds, date and greeting — duplicate clocks for multiple cities
-• Weather: current, hourly (24h/48h), 7-day and 14-day forecasts, multiple cities and transparent style
-• To-do, Notes & Focus timer: pin To-do and Notes directly onto the page (with optional transparent background), plus a 25/50-minute Focus timer and collapsible toolbar
-• Backgrounds: nature photos (daily, hourly or every tab), your own image or 6 gradients, with dimming and blur
-• Sync & Backup: Chrome profile sync plus one-click JSON export/import
+New Tab – Most Visited automatically builds a grid of your most visited websites from your browser history, including history imported from other browsers. No account or manual setup is required.
 
-100% free. No ads, no account, no paywall.
+Features
+• Most visited grid: 8 to 120 sites with real icons, smart recency-weighted ranking, drag-and-drop ordering, pinning, hiding, custom names, optional "Recently visited" row, and transparent icon style.
+• Open-tab awareness: automatically hides sites that are already open in another tab.
+• Free layout editor: move, resize, duplicate, or hide widgets with snapping, alignment guides, undo (Ctrl+Z), and Alt for unrestricted placement.
+• Search and Quick Jump: 10 search engines (Google, Bing, DuckDuckGo, Brave, Perplexity, Ecosia, Startpage, Qwant, Yahoo, Yandex), instant switching to open tabs and saved sites as you type, and transparent style.
+• World clock: 40+ time zones, 4 font styles, optional seconds, date, and greeting, with support for multiple clocks.
+• Weather: current conditions, hourly (24h/48h), 7-day, and 14-day forecasts, multiple cities, and transparent style.
+• Productivity tools: pinnable To-do and Notes widgets, Focus timer (25/50-minute sessions and breaks), and a collapsible toolbar.
+• Backgrounds: daily, hourly, or per-tab nature photos, custom image upload, or 6 gradients, with dimming and blur controls.
+• Sync and backup: Chrome profile sync plus JSON export and import.
 
-🔒 PRIVATE BY DESIGN
-Your browsing history and open tabs stay on your device and are never uploaded. No ads, analytics or tracking. To-dos and notes are stored locally. Only public domain names are sent to favicon services when needed, and rounded location (~1 km) is used solely for weather (or pick cities manually / hide weather).
+Privacy
+All browsing history and open-tab data stay on your device and are never uploaded. No ads, no analytics, and no tracking. To-do items and notes are stored locally. Only public domain names are queried for site icons when needed, and approximate location (~1 km) is used solely for weather forecasts (or cities can be set manually).
 
-💡 QUICK TIPS
-• Right-click any widget or site icon for its options.
-• Click ✥ (bottom right) to move, resize, duplicate or hide widgets; hold Alt to overlap freely.
-• Drag icons to reorder; hover to pin (📌) or hide (×).
+Completely free, with no ads, account, or paid tier.

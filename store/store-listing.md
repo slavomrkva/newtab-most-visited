@@ -30,10 +30,10 @@ Upload `store/new-tab-most-visited-3.0.0.zip`.
 | Asset | File | Size |
 |---|---|---|
 | Store icon | `icons/icon128.png` | 128×128 |
-| Screenshot 1: grid, clock, weather | `screenshot-1-grid.png` | 1280×800 |
-| Screenshot 2: hourly and 7-day forecast | `screenshot-2-forecast.png` | 1280×800 |
-| Screenshot 3: to-do list and focus timer | `screenshot-3-tools.png` | 1280×800 |
-| Screenshot 4: settings | `screenshot-4-settings.png` | 1280×800 |
+| Screenshot 1: default view (grid, clock, transparent search, to-do) | `screenshot-1-grid.png` | 1280×800 |
+| Screenshot 2: multi-city hourly and 7-day forecast | `screenshot-2-forecast.png` | 1280×800 |
+| Screenshot 3: layout editor, world clock and focus timer | `screenshot-3-tools.png` | 1280×800 |
+| Screenshot 4: streamlined settings | `screenshot-4-settings.png` | 1280×800 |
 | Small promo tile | `promo-small-440x280.png` | 440×280 |
 
 **Official URL / homepage:** optional (for example the GitHub repository).

@@ -21,7 +21,7 @@ After editing files, click ↻ on the extension card in `chrome://extensions`.
 - **Most visited grid**: 8 to 120 sites with real icons, smart recency-weighted ranking, drag-and-drop ordering, pinning, hiding, custom names, optional "Recently visited" row, and transparent icon style.
 - **Open-tab awareness**: automatically hides sites that are already open in another tab.
 - **Free layout editor (`✥`)**: move, resize, duplicate, or hide widgets with snapping, alignment guides, undo (`Ctrl+Z`), and `Alt` for unrestricted placement.
-- **Search & Quick Jump**: 10 search engines (Google, Bing, DuckDuckGo, Brave, Perplexity, Ecosia, Startpage, Qwant, Yahoo, Yandex), instant switching to open tabs and saved sites as you type, and transparent style.
+- **Search & Quick Jump**: 10 selectable search engines, instant switching to open tabs and saved sites as you type, and transparent style.
 - **World clock**: 40+ time zones, 4 font styles, optional seconds, date, and greeting, with support for multiple clocks.
 - **Weather**: current conditions, hourly (24h/48h), 7-day, and 14-day forecasts, multiple cities, transparent style, and quick link to Weather & Radar.
 - **Productivity tools**: pinnable To-do and Notes widgets, Focus timer (25/50-minute sessions and breaks), and a collapsible toolbar.
